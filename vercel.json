@@ -1,8 +1,6 @@
 {
-  "buildCommand": "hugo --cleanDestinationDir",
+  "buildCommand": "bash build.sh",
   "outputDirectory": "public",
-  "devCommand": "hugo server",
   "installCommand": "npm install",
-  "framework": null,
-  "regions": ["hkg1"]
+  "framework": null
 }
