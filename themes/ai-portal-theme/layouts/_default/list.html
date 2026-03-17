@@ -1,0 +1,168 @@
+{{ define "main" }}
+  <div class="taxonomy-page fade-in">
+    <header class="page-header">
+      <h1>
+        {{ if eq .Kind "taxonomy" }}
+          {{ if eq .Type "tags" }}
+            🏷️ 标签: {{ .Title }}
+          {{ else if eq .Type "categories" }}
+            📁 分类: {{ .Title }}
+          {{ else }}
+            {{ .Title }}
+          {{ end }}
+        {{ else if eq .Kind "term" }}
+          {{ if eq .Type "tags" }}
+            🏷️ 标签: #{{ .Title }}
+          {{ else if eq .Type "categories" }}
+            📁 分类: {{ .Title }}
+          {{ else }}
+            {{ .Title }}
+          {{ end }}
+        {{ else }}
+          {{ .Title }}
+        {{ end }}
+      </h1>
+
+      {{ with .Content }}
+        <div class="page-description">
+          {{ . }}
+        </div>
+      {{ end }}
+
+      {{ if eq .Kind "taxonomy" }}
+        <p class="taxonomy-count">
+          共 {{ len .Pages }} 篇文章
+        </p>
+      {{ end }}
+    </header>
+
+    {{ if eq .Kind "taxonomy" }}
+      <!-- 分类/标签列表页面 -->
+      <div class="taxonomy-list">
+        {{ range .Pages }}
+          <div class="taxonomy-item">
+            <a href="{{ .RelPermalink }}">
+              {{ .Title }}
+              <span class="taxonomy-count">
+                {{ len .Pages }}
+              </span>
+            </a>
+          </div>
+        {{ end }}
+      </div>
+
+      <!-- 如果是标签页面，显示标签云 -->
+      {{ if eq .Type "tags" }}
+        <div class="tags-cloud">
+          <h2>🏷️ 所有标签</h2>
+          {{ range $name, $taxonomy := site.Taxonomies.tags }}
+            <a href="{{ "tags/" | relURL }}{{ $name | urlize }}/" class="tag-cloud-item" style="font-size: {{ add 0.8 (mul (div (len $taxonomy) (len site.RegularPages)) 1.5) }}rem;">
+              #{{ $name }}
+              <span class="tag-count">({{ len $taxonomy }})</span>
+            </a>
+          {{ end }}
+        </div>
+      {{ end }}
+
+      <!-- 如果是分类页面，显示分类网格 -->
+      {{ if eq .Type "categories" }}
+        <div class="categories-grid">
+          {{ range $name, $taxonomy := site.Taxonomies.categories }}
+            <div class="category-card">
+              <a href="{{ "categories/" | relURL }}{{ $name | urlize }}/">
+                <h3>{{ $name }}</h3>
+                <p>{{ len $taxonomy }} 篇文章</p>
+              </a>
+            </div>
+          {{ end }}
+        </div>
+      {{ end }}
+    {{ else if eq .Kind "term" }}
+      <!-- 特定分类/标签下的文章列表 -->
+      <div class="posts-list">
+        {{ range .Pages }}
+          <article class="post">
+            <h2 class="post-title">
+              <a href="{{ .RelPermalink }}">
+                {{ .Title }}
+              </a>
+            </h2>
+
+            <div class="post-meta">
+              <time datetime="{{ .Date | time.Format "2006-01-02T15:04:05-07:00" }}">
+                📅 {{ .Date | time.Format ":date_long" }}
+              </time>
+
+              {{ if .Params.author }}
+                <span>
+                  👤 {{ .Params.author }}
+                </span>
+              {{ end }}
+
+              {{ if .Params.readingTime }}
+                <span>
+                  ⏱️ {{ .Params.readingTime }} 分钟阅读
+                </span>
+              {{ end }}
+            </div>
+
+            {{ if .Description }}
+              <p class="post-summary">{{ .Description }}</p>
+            {{ else if .Summary }}
+              <p class="post-summary">{{ .Summary }}</p>
+            {{ end }}
+
+            {{ with .Params.tags }}
+              <div class="post-tags">
+                {{ range first 3 . }}
+                  <a href="{{ "tags/" | relURL }}{{ . | urlize }}/" rel="tag">
+                    #{{ . }}
+                  </a>
+                {{ end }}
+                {{ if gt (len .) 3 }}
+                  <span class="more-tags">+{{ sub (len .) 3 }}</span>
+                {{ end }}
+              </div>
+            {{ end }}
+
+            <a href="{{ .RelPermalink }}" class="read-more">
+              阅读全文 →
+            </a>
+          </article>
+        {{ end }}
+
+        <!-- 分页 -->
+        {{ template "_internal/pagination.html" . }}
+      </div>
+    {{ else }}
+      <!-- 普通列表页面 -->
+      <div class="posts-list">
+        {{ range .Pages }}
+          <article class="post">
+            <h2 class="post-title">
+              <a href="{{ .RelPermalink }}">
+                {{ .Title }}
+              </a>
+            </h2>
+
+            <div class="post-meta">
+              <time datetime="{{ .Date | time.Format "2006-01-02T15:04:05-07:00" }}">
+                📅 {{ .Date | time.Format ":date_long" }}
+              </time>
+            </div>
+
+            {{ if .Description }}
+              <p class="post-summary">{{ .Description }}</p>
+            {{ else if .Summary }}
+              <p class="post-summary">{{ .Summary }}</p>
+            {{ end }}
+
+            <a href="{{ .RelPermalink }}" class="read-more">
+              阅读全文 →
+            </a>
+          </article>
+        {{ end }}
+      </div>
+    {{ end }}
+  </div>
+{{ end }}

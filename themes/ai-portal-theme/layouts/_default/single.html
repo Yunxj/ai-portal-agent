@@ -1,0 +1,71 @@
+{{ define "main" }}
+  <article class="post-content fade-in">
+    <header class="post-header">
+      <h1>{{ .Title }}</h1>
+
+      {{ $dateMachine := .Date | time.Format "2006-01-02T15:04:05-07:00" }}
+      {{ $dateHuman := .Date | time.Format ":date_long" }}
+
+      <div class="post-meta">
+        <time datetime="{{ $dateMachine }}">
+          📅 {{ $dateHuman }}
+        </time>
+
+        {{ if .Params.author }}
+          <span>
+            👤 {{ .Params.author }}
+          </span>
+        {{ end }}
+
+        {{ if .Params.readingTime }}
+          <span>
+            ⏱️ {{ .Params.readingTime }} 分钟阅读
+          </span>
+        {{ end }}
+
+        {{ with .Params.categories }}
+          <span>
+            📁 {{ delimit . ", " }}
+          </span>
+        {{ end }}
+      </div>
+    </header>
+
+    {{ if and .Site.Params.enableTOC (gt (len .TableOfContents) 100) }}
+      <aside class="toc">
+        <h3>📑 目录</h3>
+        {{ .TableOfContents }}
+      </aside>
+    {{ end }}
+
+    <div class="post-body">
+      {{ .Content }}
+    </div>
+
+    {{ with .Params.tags }}
+      <div class="post-tags">
+        {{ range . }}
+          <a href="{{ "tags/" | relURL }}{{ . | urlize }}/" rel="tag">
+            #{{ . }}
+          </a>
+        {{ end }}
+      </div>
+    {{ end }}
+
+    {{ partial "terms.html" (dict "taxonomy" "tags" "page" .) }}
+
+    <nav class="post-navigation">
+      {{ with .PrevInSection }}
+        <a class="prev-post" href="{{ .RelPermalink }}" title="上一篇：{{ .Title }}">
+          ← 上一篇
+        </a>
+      {{ end }}
+
+      {{ with .NextInSection }}
+        <a class="next-post" href="{{ .RelPermalink }}" title="下一篇：{{ .Title }}">
+          下一篇 →
+        </a>
+      {{ end }}
+    </nav>
+  </article>
+{{ end }}
