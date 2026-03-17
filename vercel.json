@@ -1,5 +1,5 @@
 {
-  "buildCommand": "bash build.sh",
+  "buildCommand": "curl -L https://github.com/gohugoio/hugo/releases/download/v0.123.7/hugo_extended_0.123.7_linux-amd64.tar.gz | tar -xz && ./hugo --cleanDestinationDir",
   "outputDirectory": "public",
   "installCommand": "npm install",
   "framework": null
